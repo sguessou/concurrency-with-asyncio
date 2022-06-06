@@ -7,21 +7,26 @@ server_address =  ('127.0.0.1', 8771)
 server_socket.bind(server_address)
 server_socket.listen()
 
+connections = []
+
 try:
-    connection, client_address = server_socket.accept()
-    print(f'I got a connection from {client_address}!')
+    while True:
+        connection, client_address = server_socket.accept()
+        print(f'I got a connection from {client_address}!')
+        connections.append(connection)
 
-    buffer = b''
+        for connection in connections:
+            buffer = b''
 
-    while buffer[-2:] != b'\r\n':
-        data = connection.recv(2)
-        if not data:
-            break
-        else:
-            print(f'I got data: {data}!')
-            buffer += data
+            while buffer[-2:] != b'\r\n':
+                data = connection.recv(2)
+                if not data:
+                    break
+                else:
+                    print(f'I got data: {data}!')
+                    buffer += data
 
-    print(f"All the data is: {buffer}")
-    connection.sendall(buffer)
+            print(f"All the data is: {buffer}")
+            connection.send(buffer)
 finally:
     server_socket.close()
